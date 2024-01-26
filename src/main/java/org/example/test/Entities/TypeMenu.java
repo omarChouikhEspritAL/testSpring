@@ -1,2 +1,7 @@
-package org.example.test.Entities;public enum TypeMenu {
+package org.example.test.Entities;
+
+public enum TypeMenu {
+    PETITDEJEUNER,
+    DEJEUNER,
+    DINER
 }
