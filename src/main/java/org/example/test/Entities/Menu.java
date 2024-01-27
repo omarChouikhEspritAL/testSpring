@@ -18,9 +18,9 @@ import java.util.List;
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long idMenu;
+    Long idMenu;
     String libelleMenu;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     TypeMenu typeMenu;
     float prixTotal;
     @OneToMany(mappedBy = "menu")

@@ -24,7 +24,7 @@ public class ClientRestController {
 
     @PostMapping("add")
     public Client addClient(@RequestBody Client client) {
-        return iClientService.add(client);
+        return iClientService.ajouterClient(client);
     }
 
 
@@ -38,5 +38,8 @@ public class ClientRestController {
         iClientService.delete(client);
     }
 
-
+    @PostMapping("affecterClientToMenu")
+    public void affectClientAuMenu(@RequestBody String identifiant,@RequestBody String libelleMenu ){
+        iClientService.affecterClientAuMenu(identifiant, libelleMenu);
+    }
 }

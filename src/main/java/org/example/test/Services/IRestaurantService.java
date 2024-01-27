@@ -11,4 +11,5 @@ public interface IRestaurantService {
     List<Restaurant> findAll();
     Restaurant find(long id);
     void  delete(Restaurant restaurant);
+    Restaurant ajouterRestaurantEtMenusAssocie(Restaurant restaurant);
 }

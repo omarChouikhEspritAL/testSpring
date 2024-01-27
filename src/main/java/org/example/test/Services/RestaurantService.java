@@ -1,17 +1,22 @@
 package org.example.test.Services;
 
 import lombok.AllArgsConstructor;
+import org.example.test.Entities.Composant;
+import org.example.test.Entities.Menu;
 import org.example.test.Entities.Restaurant;
+import org.example.test.Repository.MenuRepository;
 import org.example.test.Repository.RestaurantRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service //Définir que c'est un bean Spring
 @AllArgsConstructor
 public class RestaurantService implements IRestaurantService{
     RestaurantRepository restaurantRepository;
+    MenuRepository menuRepository;
     @Override
     public Restaurant add(Restaurant restaurant) {
         return restaurantRepository.save(restaurant);
@@ -36,19 +41,11 @@ public class RestaurantService implements IRestaurantService{
     public void delete(Restaurant restaurant) {
         restaurantRepository.delete(restaurant);
     }
-
+    @Override
     public Restaurant ajouterRestaurantEtMenusAssocie(Restaurant restaurant) {
-        // Vérifier si le restaurant existe déjà dans la base de données
-        Optional<Restaurant> existingRestaurant = restaurantRepository.findById(restaurant.getIdRestaurant());
-        if (existingRestaurant.isPresent()) {
-            // Si le restaurant existe, mettre à jour ses menus
-            Restaurant updatedRestaurant = existingRestaurant.get();
-            updatedRestaurant.setMenuList(restaurant.getMenuList());
-            return restaurantRepository.save(updatedRestaurant);
-        } else {
-            // Sinon, enregistrer le restaurant et ses menus
+        restaurant.getMenuList().stream().forEach(menu -> menu.setPrixTotal(0));
             return restaurantRepository.save(restaurant);
-        }
     }
+
 
 }

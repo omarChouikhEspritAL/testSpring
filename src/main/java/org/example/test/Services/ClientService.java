@@ -7,6 +7,7 @@ import org.example.test.Repository.ClientRepository;
 import org.example.test.Repository.MenuRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -15,7 +16,8 @@ public class ClientService implements IClientService{
     ClientRepository clientRepository;
     MenuRepository menuRepository;
     @Override
-    public Client add(Client client) {
+    public Client ajouterClient(Client client) {
+        client.setDatePremiereVisite(LocalDate.now());
         return clientRepository.save(client);
     }
 
@@ -39,25 +41,12 @@ public class ClientService implements IClientService{
         clientRepository.delete(client);
     }
 
+    @Override
     public void affecterClientAuMenu(String identifiant, String libelleMenu) {
         // Chercher le client par son identifiant
         Client existingClient = clientRepository.findByIdentifiant(identifiant);
-        if (existingClient.isPresent()) {
-            // Si le client existe, chercher le menu par son libellé
-            Menu existingMenu = menuRepository.findByLibelleMenu(libelleMenu);
-            if (existingMenu.isPresent()) {
-                // Si le menu existe, ajouter le client à sa liste de clients
-                Menu updatedMenu = existingMenu.get();
-                updatedMenu.getClients().add(existingClient.get());
-                // Enregistrer le menu modifié dans la base de données
-                menuRepository.save(updatedMenu);
-            } else {
-                // Sinon, lancer une exception
-                throw new RuntimeException("Menu introuvable");
-            }
-        } else {
-            // Sinon, lancer une exception
-            throw new RuntimeException("Client introuvable");
-        }
+        Menu menu = menuRepository.findByLibelleMenu(libelleMenu);
+        menu.getClients().add(existingClient);
+        menuRepository.save(menu);
     }
 }

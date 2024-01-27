@@ -1,18 +1,25 @@
 package org.example.test.Services;
 
 import lombok.AllArgsConstructor;
+import org.example.test.Entities.Client;
 import org.example.test.Entities.Composant;
 import org.example.test.Entities.Menu;
+import org.example.test.Repository.ClientRepository;
+import org.example.test.Repository.ComposantRepository;
 import org.example.test.Repository.MenuRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service //Définir que c'est un bean Spring
 @AllArgsConstructor
-public class MenuService implements IMenuService{
+public class MenuService implements IMenuService {
     MenuRepository menuRepository;
+    ClientRepository clientRepository;
+    ComposantRepository composantRepository;
+
     @Override
     public Menu add(Menu menu) {
         return menuRepository.save(menu);
@@ -30,7 +37,7 @@ public class MenuService implements IMenuService{
 
     @Override
     public Menu find(long id) {
-        return menuRepository.findById(id).orElse(Menu.builder().idMenu(0).build());
+        return menuRepository.findById(id).get();
     }
 
     @Override
@@ -38,26 +45,22 @@ public class MenuService implements IMenuService{
         menuRepository.delete(menu);
     }
 
-    public Menu ajoutComposantsEtMiseAJourPrixTotalMenu(List<Composant> composants, Long idMenu) {
-        // Chercher le menu par son id
-        Optional<Menu> existingMenu = menuRepository.findById(idMenu);
-        if (existingMenu.isPresent()) {
-            // Si le menu existe, ajouter les composants à sa liste de composants
-            Menu updatedMenu = existingMenu.get();
-            updatedMenu.getComposants().addAll(composants);
-            // Calculer le nouveau prix total du menu en sommant les prix des composants
-            float nouveauPrixTotal = 0.0f;
-            for (Composant composant : updatedMenu.getComposants()) {
-                nouveauPrixTotal += composant.getPrix();
+        public Menu ajouterComposantsEtMiseAJourPrixTotalMenu(Set<Composant> composants, Long idMenu){
+            Menu menu = menuRepository.findById(idMenu).orElseThrow();
+
+            if(menu.getPrixTotal()>=20) {
+                return menu;
             }
-            // Mettre à jour le prix total du menu
-            updatedMenu.setPrixTotal(nouveauPrixTotal);
-            // Enregistrer le menu modifié dans la base de données
-            return menuRepository.save(updatedMenu);
-        } else {
-            // Sinon, renvoyer null ou lancer une exception
-            return null;
+            else {
+                for (Composant com: composants) {
+                    if (menu.getPrixTotal()+ com.getPrix()<20) {
+                        menu.setPrixTotal(menu.getPrixTotal()+ com.getPrix());
+                        com.setMenu(menu);
+                        composantRepository.save(com);
+                    }
+                }
+            }
+            return menuRepository.save(menu);
         }
-    }
 
 }
